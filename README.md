@@ -3,7 +3,7 @@
 <!-- TOC -->
 
 - [Overview](#overview)
-- [Model Architecture](#model-architecture)
+- [Package Architecture](#model-architecture)
 - [Dataset](#dataset)
   - [ImageNet Classification](#ImageNet)
   - [COCO Detection](#COCO)
@@ -119,9 +119,9 @@ After cloning this repository simply run
 ```
 
 # Script Detailed Description
-The script downloads a pretrained model, quantize it and evaluate the quantization based on the model's task
+The script downloads a pretrained model, quantize it and evaluate the quantization based on the model's task.
 The evaluation/validation dataset must be downloaded in advance by the user and its path should be provided via the VALIDATION_DATASET parameter.
 A fully compressed model (quantized+compressed) is not saved, since there is no python-based framework that can use such file.
-The same mechanism was implemnted and integrated into MindSpore converter, which allows quantization and compression of models and stores the output in a flatbuffer format. Such compressed models can be used by 'Lite' devices.
+#The same mechanism was implemnted and integrated into MindSpore converter, which allows quantization and compression of models and stores the output in a flatbuffer format. Such compressed models can be used by 'Lite' devices.
 
 
