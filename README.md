@@ -47,21 +47,22 @@ The module tree looks as follows, where the last three folder are auto-generated
 ├── logs
 └── third_party
 ```
-The main script is evaluate_quantization.sh which spawns the relevant quantization and evaluation
-The models folder stores the onnx models which are automatically downloaded during the evaluation
-Logs are saved within the logs folder
-In the case of YOLO, additional code is cloned into the third_party folder
+The main script is evaluate_quantization.sh which spawns the relevant quantization and evaluation.
+The models folder stores the onnx models which are automatically downloaded during the evaluation.
+Logs are saved within the logs folder.
+In the case of YOLO, additional code is cloned into the third_party folder.
 The quantization algorithm itself is implemented in utils/quantize.py and a supllemental ANS mechanism in utils/ans.py further compresses the quantized model to measure the size of the fully compressed model.
 
 # Dataset
 
 # ImageNet Dataset
-To evaluate alexnet, VGG, Resnet and ViT we use ImageNet classification task
+To evaluate alexnet, VGG, Resnet and ViT we use ImageNet classification task.
+
 Dataset used: ImageNet2012 [link](https://image-net.org/challenges/LSVRC/2012/)
 
 - Dataset size 224*224 colorful images in 1000 classes
-    - Train：1,281,167 images  
-    - Test： 50,000 images
+    - Train: 1,281,167 images  
+    - Test: 50,000 images
 
 - Data format：JPEG
 
@@ -91,21 +92,23 @@ ImageNet2012
 in practice we use only the validation part of the dataset
 
 # COCO Dataset
-To evaluate YOLO detection we use the COCO Detection task
+To evaluate YOLO detection we use the COCO Detection task.
+
 Dataset used: [COCO2017](<https://cocodataset.org/#download>)
 
-- Dataset size：19G
-    - Train：18G，118000 images
-    - Val：1G，5000 images
-    - Annotations：241M，instances，captions，person_keypoints etc
-- Data format：image and json files
+- Dataset size, 19G
+    - Train: 18G, 118000 images
+    - Val: 1G, 5000 images
+    - Annotations: 241M, instances, captions, person_keypoints etc
+- Data format: image and json files
 
 # SQuAD Dataset
-To evaluate the distilbert model we use SQuAD v1.1 Questions and Answers Task
+To evaluate the distilbert model we use SQuAD v1.1 Questions and Answers Task.
+
 Dataset used: [SQuAD v1.1](<https://rajpurkar.github.io/SQuAD-explorer/explore/1.1/dev/>)
 
 - Val Dataset size：4.8M, 10570 questions + contexts
-- Data format：json file
+- Data format: json file
 dev-v1.1.json
 
 # Environment Requirements
