@@ -5,9 +5,9 @@
 - [Overview](#overview)
 - [Model Architecture](#model-architecture)
 - [Dataset](#dataset)
--     [ImageNet Classification](#ImageNet)
--     [COCO Detection](#COCO)
--     [BERT Dataset](#dataset)
+  - [ImageNet Classification](#ImageNet)
+  - [COCO Detection](#COCO)
+  - [SQuAD Dataset](#SQuAD)
 - [Environment Requirements](#environment-requirements)
 - [Quick Start](#quick-start)
 - [Script Detailed Description](#script-detailed-description)
@@ -16,11 +16,11 @@
 
 # Overview
 
-This folder holds code for Non-Integer Mixed Bit compression technique presented in " "   
-The implementation supports evaluation of the quantization process for the models: VGG, resnet, alexnet, ViT, YOLO, and BERT with respect to their tasks
+This folder holds the code for Rotation-Invariant quantization (RIQ) technique presented in " "   
+The implementation supports evaluation of the quantization process for the models: VGG, resnet, alexnet, ViT, YOLO, and distilBERT with respect to their tasks
 
 # Package Architecture
-The module tree loos as follows, where the last three folder are auto-generated at runtime if needed.
+The module tree looks as follows, where the last three folder are auto-generated at runtime if needed.
 
 ```shell
 ├── evaluate_quantization.sh
@@ -48,9 +48,9 @@ The module tree loos as follows, where the last three folder are auto-generated 
 └── third_party
 ```
 The main script is evaluate_quantization.sh which spawns the relevant quantization and evaluation
-In the models folder stores the onnx models which are automatically downloaded during the evaluation
+The models folder stores the onnx models which are automatically downloaded during the evaluation
 Logs are saved within the logs folder
-In the case of YOLO and BERT, additional code is cloned into the third_party folder
+In the case of YOLO, additional code is cloned into the third_party folder
 The quantization algorithm itself is implemented in utils/quantize.py and a supllemental ANS mechanism in utils/ans.py further compresses the quantized model to measure the size of the fully compressed model.
 
 # Dataset
@@ -101,7 +101,8 @@ Dataset used: [COCO2017](<https://cocodataset.org/#download>)
 - Data format：image and json files
 
 # SQuAD Dataset
-To evaluate the distilbert model we use SQuAD v1.1 dataset
+To evaluate the distilbert model we use SQuAD v1.1 Questions and Answers Task
+Dataset used: [SQuAD v1.1](<https://rajpurkar.github.io/SQuAD-explorer/explore/1.1/dev/>)
 
 - Val Dataset size：4.8M, 10570 questions + contexts
 - Data format：json file
