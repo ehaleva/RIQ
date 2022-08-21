@@ -58,7 +58,7 @@ The quantization algorithm itself is implemented in utils/quantize.py and a supl
 # ImageNet Dataset
 To evaluate alexnet, VGG, Resnet and ViT we use ImageNet classification task.
 
-Dataset used: ImageNet2012 [link](https://image-net.org/challenges/LSVRC/2012/)
+Dataset used: [ImageNet2012](<https://image-net.org/challenges/LSVRC/2012/>)
 
 - Dataset size 224*224 colorful images in 1000 classes
     - Train: 1,281,167 images  
@@ -66,7 +66,7 @@ Dataset used: ImageNet2012 [link](https://image-net.org/challenges/LSVRC/2012/)
 
 - Data format：JPEG
 
-- Download the dataset ImageNet2012
+- **Only the test part of the dataset is used in our script**
 
 The directory tree looks like this with 1000 folders for the different class, and each folder contains \*.JPEG images
 ```shell
@@ -89,7 +89,6 @@ ImageNet2012
     └── n15075141
 ```
     
-in practice we use only the validation part of the dataset
 
 # COCO Dataset
 To evaluate YOLO detection we use the COCO Detection task.
@@ -101,6 +100,7 @@ Dataset used: [COCO2017](<https://cocodataset.org/#download>)
     - Val: 1G, 5000 images
     - Annotations: 241M, instances, captions, person_keypoints etc
 - Data format: image and json files
+- **Only the Val part of the dataset is used in our script**
 
 # SQuAD Dataset
 To evaluate the distilbert model we use SQuAD v1.1 Questions and Answers Task.
@@ -110,6 +110,7 @@ Dataset used: [SQuAD v1.1](<https://rajpurkar.github.io/SQuAD-explorer/explore/1
 - Val Dataset size：4.8M, 10570 questions + contexts
 - Data format: json file
 dev-v1.1.json
+- **Only the Val part of the dataset is used in our script**
 
 # Environment Requirements
 Required python libraries are given in prerequisites.txt file
@@ -118,13 +119,14 @@ Required python libraries are given in prerequisites.txt file
 After cloning this repository simply run
 
 ```bash
-./evaluate_quantization.sh.sh MODEL VALIDATION_DATASET [-d distortion] [-c calibration dataset] 
+./evaluate_quantization.sh MODEL VALIDATION_DATASET [-d distortion] [-c calibration dataset] 
 ```
 
 # Script Detailed Description
 The script downloads a pretrained model, quantize it and evaluate the quantization based on the model's task.
 The evaluation/validation dataset must be downloaded in advance by the user and its path should be provided via the VALIDATION_DATASET parameter.
 A fully compressed model (quantized+compressed) is not saved, since there is no python-based framework that can use such file.
-#The same mechanism was implemnted and integrated into MindSpore converter, which allows quantization and compression of models and stores the output in a flatbuffer format. Such compressed models can be used by 'Lite' devices.
+
+[//]: # (The same mechanism was implemnted and integrated into MindSpore converter, which allows quantization and compression of models and stores the output in a flatbuffer format. Such compressed models can be used by 'Lite' devices.)
 
 
