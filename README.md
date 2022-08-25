@@ -20,14 +20,13 @@ This folder holds the code for Rotation-Invariant quantization (RIQ) technique p
 The implementation supports evaluation of the quantization process for the models: VGG, resnet, alexnet, ViT, YOLO, and distilBERT with respect to their tasks
 
 # Package Architecture
-The module tree looks as follows, where the last three folder are auto-generated at runtime if needed.
+The module tree looks as follows, where the last four folder are auto-generated at runtime if needed.
 
 ```shell
 ├── evaluate_quantization.sh
 ├── evaluate_nlp.py
 ├── compare_cv.py
 ├── README.md
-├── models
 ├── utils
 │   ├── ans.py
 │   ├── dataset.py
@@ -45,6 +44,7 @@ The module tree looks as follows, where the last three folder are auto-generated
 │   └── download_YOLO.py
 ├── empty_calibration
 ├── logs
+├── models
 └── third_party
 ```
 The main script is evaluate_quantization.sh which spawns the relevant quantization and evaluation.
