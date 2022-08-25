@@ -16,6 +16,8 @@ checkopts()
 {
   DISTORTION=0.005
   mkdir -p empty_calibration
+  mkdir -p models
+  mkdir -p logs
   CAL_DATASET=$(pwd)/empty_calibration
   while getopts 'd:c:' opt
   do
@@ -41,7 +43,6 @@ if (($# < 2)); then
 fi
 
 checkopts ${@:3}
-
 
 if [[ -f $1 ]]; then
     MODEL_ONNX=$1
@@ -75,7 +76,6 @@ if [[ ! -d "$CAL_DATASET" ]]; then
 fi
 
 
-mkdir -p logs
 if (($# > 3)); then
   LOG_FILE=logs/log_${MODEL}_${DISTORTION}.txt
 else
