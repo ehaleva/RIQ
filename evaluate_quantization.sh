@@ -85,14 +85,9 @@ LOG_FILE=$(realpath $LOG_FILE)
 MODEL_ONNX=$(realpath $MODEL_ONNX)
 
 if  [[ $MODEL == *"VGG"* ]] || [[ $MODEL == *"resnet"* ]] || [[ $MODEL == "ViT" ]] || [[ $MODEL == "alexnet" ]]; then
-    if [[ $DISTORTION == "All" ]]; then
-	echo "Calling combined python script"
-        python python_files/resnet_vgg/run_all_distortions.py $MODEL $MODEL_ONNX $VAL_DATASET ${CAL_DATASET[*]} | tee ${LOG_FILE}
-    else
-        python compare_cv.py $MODEL $MODEL_ONNX $VAL_DATASET ${CAL_DATASET[*]} $DISTORTION| tee ${LOG_FILE} || exit 1
-        echo "To summarize:"
-        awk '/Actual CR:/ {print; }' ${LOG_FILE} >> ${LOG_FILE}
-    fi
+    python compare_cv.py $MODEL $MODEL_ONNX $VAL_DATASET ${CAL_DATASET[*]} $DISTORTION| tee ${LOG_FILE} || exit 1
+    echo "To summarize:"
+    awk '/Actual CR:/ {print; }' ${LOG_FILE} >> ${LOG_FILE}
 elif [[ $MODEL == *"YOLO"* ]]; then
     if [[ ! -d third_party/yolov5 ]]; then
 	echo "cloning third party repo Ultralytics"
