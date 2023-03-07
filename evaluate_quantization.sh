@@ -1,8 +1,9 @@
+#!/bin/bash
 
 usage() {
-    echo "evaluate_quantization.sh MODEL VALIDATION_DATASET [-d DISTORTION] [-c CALIBRATION_DATA]" 
+    echo "evaluate_quantization.sh MODEL [ -v VALIDATION_DATASET] [-d DISTORTION] [-c CALIBRATION_DATA]"
     echo "                         MODEL can be either one of the following models: VGG, resnet, alexnet, ViT, YOLO, or BERT"
-    echo "                               alternatively an onnx model filename"
+    echo "                               alternatively an onnx model path + filename"
     echo "                         VALIDATION_DATASET is a path to an Imagenet folder for the case of VGG, resnet, alexnet or ViT"
     echo "                                               a path to a COCO folder for the case of YOLO"
     echo "                                               a path to a XXX  folder for the case of BERT"
@@ -15,11 +16,12 @@ usage() {
 checkopts()
 {
   DISTORTION=0.005
-  mkdir -p empty_calibration
+  mkdir -p empty_path
   mkdir -p models
   mkdir -p logs
-  CAL_DATASET=$(pwd)/empty_calibration
-  while getopts 'd:c:' opt
+  CAL_DATASET=$(pwd)/empty_path
+  VAL_DATASET=$(pwd)/empty_path
+  while getopts 'd:c:v:' opt
   do
     case "${opt}" in
       d)
@@ -27,6 +29,9 @@ checkopts()
         ;;
       c)
         CAL_DATASET=$OPTARG
+        ;;
+      v)
+        VAL_DATASET=$OPTARG
         ;;
       *)
         echo "Unknown option ${opt}!"
@@ -36,9 +41,7 @@ checkopts()
   done
 }
 
-VAL_DATASET=$(realpath $2)
-
-if (($# < 2)); then
+if (($# < 1)); then
     usage
 fi
 
@@ -85,8 +88,7 @@ LOG_FILE=$(realpath $LOG_FILE)
 MODEL_ONNX=$(realpath $MODEL_ONNX)
 
 if  [[ $MODEL == *"VGG"* ]] || [[ $MODEL == *"resnet"* ]] || [[ $MODEL == "ViT" ]] || [[ $MODEL == "alexnet" ]]; then
-    python compare_cv.py $MODEL $MODEL_ONNX $VAL_DATASET ${CAL_DATASET[*]} $DISTORTION| tee ${LOG_FILE} || exit 1
-    echo "To summarize:"
+    python -u compare_cv.py $MODEL $MODEL_ONNX $VAL_DATASET ${CAL_DATASET[*]} $DISTORTION| tee ${LOG_FILE} || exit 1
     awk '/Actual CR:/ {print; }' ${LOG_FILE} >> ${LOG_FILE}
 elif [[ $MODEL == *"YOLO"* ]]; then
     if [[ ! -d third_party/yolov5 ]]; then
@@ -97,29 +99,27 @@ elif [[ $MODEL == *"YOLO"* ]]; then
 	cd -
     fi
     PATH_QUANT_MODEL_ONNX=$(realpath 'models/'$MODEL'_quant.onnx')
-    #python utils/quantize_yolo.py $MODEL_ONNX $PATH_QUANT_MODEL_ONNX 1663 | tee ${LOG_FILE}
-    python utils/quantize_yolo.py $MODEL_ONNX $PATH_QUANT_MODEL_ONNX $DISTORTION $CAL_DATASET | tee ${LOG_FILE}
+    python -u utils/quantize_yolo.py $MODEL_ONNX $PATH_QUANT_MODEL_ONNX $DISTORTION $CAL_DATASET | tee ${LOG_FILE}
     cd third_party
     mkdir -p datasets
     rm datasets/coco
     ln -s $VAL_DATASET datasets/coco 
     echo "Evaluating Quantized model" >> ${LOG_FILE}
-    python yolov5/val.py --weights $PATH_QUANT_MODEL_ONNX --data yolov5/data/coco.yaml | tee -a ${LOG_FILE}
+    python -u yolov5/val.py --weights $PATH_QUANT_MODEL_ONNX --data yolov5/data/coco.yaml | tee -a ${LOG_FILE}
     echo "Evaluating Original model" >> ${LOG_FILE}
-    python yolov5/val.py --weights $MODEL_ONNX --data yolov5/data/coco.yaml | tee -a ${LOG_FILE}
+    python -u yolov5/val.py --weights $MODEL_ONNX --data yolov5/data/coco.yaml | tee -a ${LOG_FILE}
     cd -
 elif [[ "${MODEL,,}" == *"bert"* ]]; then
-    if [[ $CAL_DATASET != $(pwd)/empty_calibration ]]; then
+    if [[ $CAL_DATASET != $(pwd)/empty_path ]]; then
         echo "BERT quantization does not supoort a calibration dataset"
 	usage
     fi
     PATH_QUANT_MODEL_ONNX=$(realpath 'models/'$MODEL'_quant.onnx')
-    python utils/quantize_bert.py $MODEL_ONNX $PATH_QUANT_MODEL_ONNX $DISTORTION $VAL_DATASET | tee ${LOG_FILE}
+    python -u utils/quantize_bert.py $MODEL_ONNX $PATH_QUANT_MODEL_ONNX $DISTORTION $VAL_DATASET | tee ${LOG_FILE}
     echo "Evaluating Quantized model" >> ${LOG_FILE}
-    python evaluate_nlp.py $PATH_QUANT_MODEL_ONNX $VAL_DATASET | tee -a ${LOG_FILE}
+    python -u evaluate_nlp.py $PATH_QUANT_MODEL_ONNX $VAL_DATASET | tee -a ${LOG_FILE}
     echo "Evaluating Original model" >> ${LOG_FILE}
-    python evaluate_nlp.py $MODEL_ONNX $VAL_DATASET | tee -a ${LOG_FILE}
+    python -u evaluate_nlp.py $MODEL_ONNX $VAL_DATASET | tee -a ${LOG_FILE}
 else
     usage
 fi
-#!/bin/bash

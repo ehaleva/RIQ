@@ -1,11 +1,10 @@
 """download yolo model from sparsezoo"""
 import os
-from sparsezoo.models import Zoo
+from sparsezoo import Model
 
 stub = "zoo:cv/detection/yolov5-s/pytorch/ultralytics/coco/base-none"
-override_folder_name = 'sparsezoo_yolo'
-model = Zoo.download_model_from_stub(stub, override_folder_name=override_folder_name,
-                                     override_parent_path="models/downloads")
+download_path = 'models/downloads/sparsezoo_yolo'
+model = Model(stub, download_path=download_path)
 os.system('mv models/downloads/sparsezoo_yolo/model.onnx models/YOLO.onnx')
 os.system('rm -dfr models/downloads')
 

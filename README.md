@@ -119,7 +119,7 @@ Required python libraries are given in prerequisites.txt file
 After cloning this repository simply run
 
 ```bash
-./evaluate_quantization.sh MODEL VALIDATION_DATASET [-d distortion] [-c calibration dataset] 
+./evaluate_quantization.sh MODEL [-v VALIDATION_DATASET] [-d distortion] [-c calibration dataset] 
 ```
 
 # Script Detailed Description
@@ -127,6 +127,6 @@ The script downloads a pretrained model, quantize it and evaluate the quantizati
 The evaluation/validation dataset must be downloaded in advance by the user and its path should be provided via the VALIDATION_DATASET parameter.
 A fully compressed model (quantized+compressed) is not saved, since there is no python-based framework that can use such file.
 
-[//]: # (The same mechanism was implemnted and integrated into MindSpore converter, which allows quantization and compression of models and stores the output in a flatbuffer format. Such compressed models can be used by 'Lite' devices.)
+
 
 

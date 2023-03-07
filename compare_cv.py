@@ -8,7 +8,7 @@ import torchvision
 import numpy as np
 from utils import presets
 from utils.onnx_bridge import OnnxBridge
-from utils.quantize import get_quantized_model, measure_cos_distance
+from utils.quantize import get_quantized_model
 from utils.dataset import prepare_dataset_images
 
 def measure_cos_err(lhs, rhs):
@@ -46,7 +46,7 @@ def eval_model(base_model, quant_model, testloader):
                 oputputs_quant.append(output_quant)
                 output_base = base_model(img)[0][0, :]
                 outputs_base.append(output_base)
-                total_cos_error += measure_cos_distance(output_quant, output_base)
+                total_cos_error += measure_cos_err(output_quant, output_base)
             _, predicted_base = torch.max(torch.nn.Softmax(dim=-1)
                                           (torch.Tensor(np.array(outputs_base))), 1)
             _, predicted_quant = torch.max(torch.nn.Softmax(dim=-1)
@@ -87,10 +87,13 @@ def main():
                                       compare_function=compare_function)
     quant_model.save(quant_onnx_fn)
     valdir = os.path.join(data_path, 'val')
-    dataset_test = data_loader(valdir)
-    testloader = torch.utils.data.DataLoader(dataset_test, batch_size=batch_size,
+    if os.path.exists(valdir):
+        dataset_test = data_loader(valdir)
+        testloader = torch.utils.data.DataLoader(dataset_test, batch_size=batch_size,
                                              num_workers=4, shuffle=True)
-    print("Measuring Accuracy on validation dataset")
-    eval_model(base_model, quant_model, testloader)
+        print("Measuring Accuracy on validation dataset")
+        eval_model(base_model, quant_model, testloader)
+    else:
+        print("No validation dataset was provided. Exiting without evaluating accuracy.")
 
 main()

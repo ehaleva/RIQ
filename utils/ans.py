@@ -46,6 +46,22 @@ def decode_symbol(state, bit_stream, state_t):
     return symbol, state, bit_stream
 
 
+def efficient_decode_symbol(bit_stream, end, state, state_t):
+    """ Convert Bits from Bitstream to the new State. """
+    symbol = state_t[state]['symbol']
+    nb_bits = state_t[state]['nbBits']
+
+    if nb_bits == 0 or end == 0:
+        state = state_t[state]['newX']
+        return symbol, state, end
+
+    start = max(0,end-nb_bits)
+    bits = bit_stream[start:end]
+    rest = int(bits, 2)
+    state = state_t[state]['newX'] + rest
+    return symbol, state, start
+
+
 class TabledANS:
     def __init__(self, symbol_occurrences, table_log=5):
         self.table_log = table_log
@@ -54,8 +70,6 @@ class TabledANS:
             raise RuntimeError("Table size {} less than number of symbols {}"
                                .format(self.table_size, len(symbol_occurrences)))
         freq_sum = np.sum(list(symbol_occurrences.values()))
-        #print(len(symbol_occurrences.values()), freq_sum)
-        #print(symbol_occurrences.values())
         if freq_sum != self.table_size:
             # Normalize frequencies table
             freq_norm = \
@@ -69,25 +83,12 @@ class TabledANS:
                 max_ix = np.argmax(freq_norm)
                 freq_norm[max_ix] -= 1
                 reminder += 1
-                #delta = reminder // freq_norm[freq_norm > 1].size
-                #for i in range(len(freq_norm)):
-                #    if reminder == 0:
-                #        break
-                #    if freq_norm[i] > 1:
-                #        freq_norm[i] += delta if reminder <= delta else reminder
-                #        reminder -= delta if reminder <= delta else reminder
+
             if reminder > 0:
                 #grow the frequencies to fit the table
                 max_ix = np.argmax(freq_norm)
                 freq_norm[max_ix] += reminder
 
-            #elif reminder > 1:
-                #for i in range(len(freq_norm)):
-                    #if reminder == 0:
-                        #break
-                    #freq_norm[i] += 1
-                    #reminder -= 1
-            #print(freq_norm.sum())
             assert freq_norm.sum() == self.table_size
             symbol_occurrences = dict([(k, int(freq_norm[i]))
                                        for i, k in enumerate(symbol_occurrences.keys())])
@@ -124,10 +125,6 @@ class TabledANS:
             index = symbol_list.index(s)
             self.coding_table[cumulative_cp[index]] = self.table_size + i
             cumulative_cp[index] += 1
-            #outputBits[i] = self.tableLog - first1Index(self.tableSize + i)
-        #print(freq_norm)
-        #print("skip table", step)
-        #print(state_table - min(state_table))
         #####
         # Create the Symbol Transformation Table
         #####
@@ -167,13 +164,10 @@ class TabledANS:
     @staticmethod
     def from_data(data, table_log=None):
         """from data"""
-        #c, v =
-        # np.histogram(data, bins=int(max(data)-min(data))+1, range= [min(data)-.5, max(data)+.5])
-        #v = (v+0.5)[:-1]
         v, c = np.unique(data, return_counts=True)
         symbol_occurrences = dict([(v_, c_) for v_, c_ in zip(v, c)])
         if table_log is None:
-            table_log = max(5, 3 + int(np.ceil(np.log2(len(c))))) # sefi added
+            table_log = max(5, 3 + int(np.ceil(np.log2(len(c)))))
         return TabledANS(symbol_occurrences, table_log)
 
     def encode_efficient(self, symbol, state, symbol_tt):
@@ -219,16 +213,25 @@ class TabledANS:
         """ decode data"""
         output = []
         state, bit_stream = bits_to_state(bit_stream, self.table_log)
-        while len(bit_stream) > 0:
-            symbol, state, bit_stream = decode_symbol(state, bit_stream, self.decode_table)
-            output = [symbol] + output
+        end = len(bit_stream)
+        while end > 0:
+            symbol, state, end  = efficient_decode_symbol(bit_stream, end, state,  self.decode_table)
+            output.append(symbol)
         # cover a corner case when last symbols encoded with zero bits
         while self.decode_table[state]['nbBits'] == 0 and self.decode_table[state]['newX'] != 0:
-            symbol, state, bit_stream = decode_symbol(state, bit_stream, self.decode_table)
-            output = [symbol] + output
+            symbol = self.decode_table[state]['symbol']
+            state = self.decode_table[state]['newX']
+
+            if self.decode_table[state]['nbBits'] != 0:
+                break
+            output.append(symbol)
+
+        output.reverse()
         return output
+
 
     @property
     def total_tables_size(self):
         """total tables size"""
         return len(self.coding_table) + 3 * len(self.decode_table) + 2 * len(self.symbol_tt)
+
