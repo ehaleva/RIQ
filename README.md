@@ -129,7 +129,7 @@ A fully compressed model (quantized+compressed) is not saved, since there is no 
 
 # Citation
 Please site our paper if you find this repository relevant to your research
-@article{kampeas2023rotation,
+```@article{kampeas2023rotation,
       title={Rotation Invariant Quantization for Model Compression}, 
       author={Joseph Kampeas and Yury Nahshan and Hanoch Kremer and Gil Lederman and Shira Zaloshinski and Zheng Li and Emir Haleva},
       year={2023},
@@ -137,3 +137,4 @@ Please site our paper if you find this repository relevant to your research
       archivePrefix={arXiv},
       primaryClass={cs.LG}
 }
+```
