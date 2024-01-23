@@ -127,6 +127,7 @@ The script downloads a pretrained model, quantize it and evaluate the quantizati
 The evaluation/validation dataset must be downloaded in advance by the user and its path should be provided via the VALIDATION_DATASET parameter.
 A fully compressed model (quantized+compressed) is not saved, since there is no python-based framework that can use such file.
 
+<!---
 # Citation
 Please site our paper if you find this repository relevant to your research
 ```
@@ -138,4 +139,5 @@ Please site our paper if you find this repository relevant to your research
       archivePrefix={arXiv},
       primaryClass={cs.LG}
 }
+--->
 ```
